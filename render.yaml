@@ -1,0 +1,34 @@
+# Render — configuração do servidor de WhatsApp (Kairós) — v5.3.0
+# ---------------------------------------------------------------
+# CAMINHO MAIS SIMPLES: suba o código no GitHub, clique em
+# "New → Blueprint" no Render e escolha o repositório. Ele lê este
+# arquivo e cria tudo sozinho: imagem Docker, disco, plano e a checagem
+# de saúde. Você NÃO digita porta, comando de start nem build command.
+#
+# NENHUMA VARIÁVEL PARA PREENCHER. O servidor fala com o banco pela
+# função wpp-agente do Backend, então não precisa de chave secreta
+# nenhuma no painel do Render.
+#
+# IMPORTANTE:
+#   - Plano "starter" (o grátis NÃO serve: ele dorme e não tem disco)
+#   - O disco é obrigatório para a sessão do WhatsApp sobreviver
+#   - NÃO cadastre PORT: o Render injeta a porta sozinho
+#   - NÃO precisa cadastrar WPP_AUTH_DIR: o servidor acha o disco sozinho
+
+services:
+  - type: web
+    name: kairos-whatsapp
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    # virginia (EUA, costa leste) é a região mais próxima do Brasil no Render.
+    region: virginia
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: TZ
+        value: America/Sao_Paulo
+    disk:
+      name: wpp-auth
+      mountPath: /var/data
+      sizeGB: 1
